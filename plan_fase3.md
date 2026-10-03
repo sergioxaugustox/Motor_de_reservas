@@ -22,15 +22,32 @@
       rechaza datetimes sin zona horaria, **no acepta `estado` ni `urgencia`**
 - [x] `models.py` — `Triaje.urgencia` + `CheckConstraint` de estados válidos +
       `ExcludeConstraint` con `where= text("estado <> 'cancelada'")`
-- [x] 2ª migración Alembic `3fb05b6732d6` generada **y editada a mano**
+- [x] 2ª migración Alembic `3fb05b6732d6` generada **y editada a mano** (autogenerate no ve CHECK ni el `WHERE`)
 - [x] Sintaxis verificada con `ast.parse` (4 ops en `upgrade`, 4 en `downgrade`)
+- [x] Dry-run offline: `alembic upgrade 9ce081662eba:3fb05b6732d6 --sql` renderiza las 4
+      operaciones + `UPDATE alembic_version` + `COMMIT` sin tocar la base
+- [x] `alembic upgrade head` aplicado. `alembic_version = 3fb05b6732d6`
+- [x] Verificado por `pg_get_constraintdef`: `triaje.urgencia` = `varchar(30) NOT NULL`;
+      EXCLUDE con `WHERE (((estado)::text <> 'cancelada'::text))`;
+      CHECK con `ARRAY['reservada','cancelada','atendida','no_asistio']`; 4 tablas en 0 filas
 - [x] `requirements.txt` regenerado en UTF-8 (venía en UTF-16, `>` de PowerShell 5.1)
+
+### Trampa documentada: `op.drop_constraint` y el `type_`
+
+El `types` dict de `alembic/operations/schemaobj.py` solo tiene 5 claves:
+`"foreignkey"`, `"primary"`, `"unique"`, `"check"` y `None`.
+
+- `type_="exclude"` → `KeyError: 'exclude'` → `TypeError`. **Ese valor no existe.**
+- Para borrar un EXCLUDE: `type_=None` — el valor `None` de Python, **sin comillas**.
+  Sale `ALTER TABLE citas DROP CONSTRAINT citas_no_traslapan;`
+- `type_="check"` sí es válido, para el CHECK.
+- El `type_` no dice "qué constraint borrar": dice **qué clase de SQLAlchemy construir**,
+  y la palabra clave (`CHECK`, `FOREIGN KEY`...) la pone esa clase.
 
 ### Pendiente del bloque 2 (arranca la próxima sesión)
 
-- [ ] `alembic upgrade head` — **lo corre el autor**, no el agente
-- [ ] Verificar 3 cosas por `pg_get_constraintdef`: columna `triaje.urgencia`,
-      `WHERE (estado <> 'cancelada')` en el EXCLUDE, `CHECK` con `'reservada'`
+- [ ] `alembic downgrade -1` y `alembic upgrade head`: **compilar no es probar**.
+      Es el único modo de saber que el `downgrade()` está bien.
 - [ ] Prueba en vivo de 5 etapas (ver abajo)
 - [ ] Cosméticos en `models.py`: `name = "..."` → `name="..."`,
       `where= text ("...")` → `where=text("...")`, dos líneas en blanco entre clases
