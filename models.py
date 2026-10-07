@@ -6,7 +6,7 @@ from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, String, f
 
 
 class Cita(Base):
-    __tablename__="citas"
+    __tablename__ = "citas"
     id: Mapped[int] = mapped_column(primary_key=True)
     recurso_id: Mapped[int] = mapped_column(ForeignKey("recursos.id"))
     usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
@@ -17,17 +17,18 @@ class Cita(Base):
     __table_args__ = (
         CheckConstraint(
             "estado IN ('reservada', 'cancelada', 'atendida', 'no_asistio')",
-            name = "citas_estado_valido",
+            name="citas_estado_valido",
         ),
 
         ExcludeConstraint(
             ("recurso_id", "="),
             ("periodo", "&&"),
             using="gist",
-            where= text ("estado <> 'cancelada'"),
+            where=text("estado <> 'cancelada'"),
             name="citas_no_traslapan",
         ),
-    ) 
+    )
+
 
 class Triaje(Base):
     __tablename__ = "triaje"
@@ -39,7 +40,7 @@ class Triaje(Base):
     es_nino: Mapped[bool] = mapped_column(Boolean, default=False)
     hipertenso: Mapped[bool] = mapped_column(Boolean, default=False)
     diabetico: Mapped[bool] = mapped_column(Boolean, default=False)
-                                   
+
 
 class Usuario(Base):
     """Dentista / recepcionista / admin de la clínica."""
@@ -50,7 +51,7 @@ class Usuario(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     nombre: Mapped[str] = mapped_column(String(120))
     rol: Mapped[str] = mapped_column(String(30), default="dentista")
-    creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True),server_default=func.now())
+    creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class Recurso(Base):
