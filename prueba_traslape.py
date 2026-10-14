@@ -47,4 +47,11 @@ print("Etapa 2:", insertar(traslape))
 limite = Cita(recurso_id=recurso.id, usuario_id=usuario.id, periodo=rango(11, 0, 12, 0))
 print("Etapa 3:", insertar(limite))
 
+# --- Etapa 4: cancelar la cita base libera su horario ---
+cita_base.estado = "cancelada"
+db.commit()
+print("Etapa 4a: cita", cita_base.id, "->", cita_base.estado)
+reinsercion = Cita(recurso_id=recurso.id, usuario_id=usuario.id, periodo=rango(10, 30, 11, 0))
+print("Etapa 4b:", insertar(reinsercion))
+
 db.close()
