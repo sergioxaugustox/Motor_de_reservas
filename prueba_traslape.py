@@ -54,4 +54,10 @@ print("Etapa 4a: cita", cita_base.id, "->", cita_base.estado)
 reinsercion = Cita(recurso_id=recurso.id, usuario_id=usuario.id, periodo=rango(10, 30, 11, 0))
 print("Etapa 4b:", insertar(reinsercion))
 
+# --- Etapa 5: dos canceladas que se traslapan no chocan ---
+cancelada_a = Cita(recurso_id=recurso.id, usuario_id=usuario.id, periodo=rango(14, 0, 15, 0), estado="cancelada")
+cancelada_b = Cita(recurso_id=recurso.id, usuario_id=usuario.id, periodo=rango(14, 30, 15, 30), estado="cancelada")
+print("Etapa 5a:", insertar(cancelada_a))
+print("Etapa 5b:", insertar(cancelada_b))
+
 db.close()
