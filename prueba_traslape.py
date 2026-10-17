@@ -60,4 +60,8 @@ cancelada_b = Cita(recurso_id=recurso.id, usuario_id=usuario.id, periodo=rango(1
 print("Etapa 5a:", insertar(cancelada_a))
 print("Etapa 5b:", insertar(cancelada_b))
 
+# --- Etapa 6: estado fuera de la lista blanca (debe rechazarse con 23514) ---
+invalida = Cita(recurso_id=recurso.id, usuario_id=usuario.id, periodo=rango(16, 0, 17, 0), estado="pendiente")
+print("Etapa 6:", insertar(invalida))
+
 db.close()
