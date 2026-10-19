@@ -64,4 +64,11 @@ print("Etapa 5b:", insertar(cancelada_b))
 invalida = Cita(recurso_id=recurso.id, usuario_id=usuario.id, periodo=rango(16, 0, 17, 0), estado="pendiente")
 print("Etapa 6:", insertar(invalida))
 
+# --- Eyapa 7: Triaje 1:1 con la cita del caso limite, la urgencia se guarda y se relee ---
+triaje = Triaje(cita_id=limite.id, motivo="Dolor intenso en la muela", urgencia= "alta", hipertenso = True)
+db.add(triaje)
+db.commit()
+db.refresh(triaje)
+print("Etapa 7: triaje", triaje.id, "| cita", triaje.cita_id,"|urgencia", triaje.urgencia, "|hipertenso", triaje.hipertenso, "|es_nino", triaje.es_nino) 
+
 db.close()
