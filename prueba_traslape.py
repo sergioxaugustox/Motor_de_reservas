@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.exc import IntegrityError
-
+from sqlalchemy import delete, func, select
 from database import SessionLocal
 from models import Cita, Recurso, Triaje, Usuario
 
@@ -25,7 +25,15 @@ def insertar(cita):
         db.rollback()
         return f"RECHAZADA {e.orig.pgcode}"
 
+def limpiar():
+    """ borra TODO en las 4 tablas (hijos -> padres) y devuelve el conteo. SOLO base de pruebas"""
+    for modelo in (Triaje, Cita, Recurso, Usuario):
+        db.execute(delete(modelo))
+    db.commit()
+    return [db.scalar(select(func.count()).select_from(m)) for m in (Usuario, Recurso, Cita, Triaje)]
+
 db = SessionLocal()   
+print("Limpieza inicial:", limpiar())
 
 #datos de prueba
 usuario = Usuario(email="test@test.com", password_hash ="no-es-un-hash", nombre="Dra prueba")
@@ -69,6 +77,9 @@ triaje = Triaje(cita_id=limite.id, motivo="Dolor intenso en la muela", urgencia=
 db.add(triaje)
 db.commit()
 db.refresh(triaje)
-print("Etapa 7: triaje", triaje.id, "| cita", triaje.cita_id,"|urgencia", triaje.urgencia, "|hipertenso", triaje.hipertenso, "|es_nino", triaje.es_nino) 
+print("Etapa 7: triaje", triaje.id, "| cita", triaje.cita_id,"| urgencia", triaje.urgencia, "| hipertenso", triaje.hipertenso, "| es_nino", triaje.es_nino) 
+
+# --- Etapa 8: limpieza final (la base queda como la encontramos) ---
+print("Etapa 8: limpieza final", limpiar())
 
 db.close()
