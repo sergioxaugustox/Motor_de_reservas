@@ -41,6 +41,13 @@ class Triaje(Base):
     hipertenso: Mapped[bool] = mapped_column(Boolean, default=False)
     diabetico: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    __table_args__ = (
+        CheckConstraint(
+            "urgencia IN ('baja', 'media', 'alta', 'urgente')",
+            name="triaje_urgencia_valida",
+        ),
+    )
+
 
 class Usuario(Base):
     """Dentista / recepcionista / admin de la clínica."""
