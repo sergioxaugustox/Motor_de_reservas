@@ -79,6 +79,10 @@ db.commit()
 db.refresh(triaje)
 print("Etapa 7: triaje", triaje.id, "| cita", triaje.cita_id,"| urgencia", triaje.urgencia, "| hipertenso", triaje.hipertenso, "| es_nino", triaje.es_nino) 
 
+# --- Etapa 9: urgencia fuera de la lista blanca; el CHECK la rechaza ---
+invalido = Triaje(cita_id=reinsercion.id, motivo="Prueba urgencia invalida", urgencia="altisima")
+print("Etapa 9:", insertar(invalido))
+
 # --- Etapa 8: limpieza final (la base queda como la encontramos) ---
 print("Etapa 8: limpieza final", limpiar())
 
