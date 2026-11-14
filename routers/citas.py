@@ -59,5 +59,4 @@ def crear_cita(datos: CitaCreate, db: Session = Depends(get_db)):
         raise
     db.refresh(cita)
     db.refresh(triaje)
-    return CitaOut.desde_cita(cita, triaje)    
-        
+    return CitaOut.desde_cita(cita, triaje)
