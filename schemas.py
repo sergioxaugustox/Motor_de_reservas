@@ -30,18 +30,18 @@ class CitaCreate(BaseModel):
     triaje: TriajeEntrada
 
     @model_validator(mode="after")
-    def revisar_orden_del_periodo(self):
-        if self.fin <= self.inicio:
-            raise ValueError("fin debe ser posterior a inicio")
-        return self
-
-    @model_validator(mode="after")
     def revisar_zona_horaria(self):
         if self.inicio.tzinfo is None or self.fin.tzinfo is None:
             raise ValueError(
-                
+                "inicio y fin deben incluir zona horaria, por ejemplo -06:00"
             )
         return self
+
+    @model_validator(mode="after")
+    def revisar_orden_del_periodo(self):
+        if self.fin <= self.inicio:
+            raise ValueError("fin debe ser posterior a inicio")
+        return self    
 
 
 # ============================================================== SALIDA =====
@@ -180,6 +180,16 @@ CASOS_INVALIDOS = [
             "recurso_id": 1,
             "usuario_id": 1,
             "inicio": "2026-09-25T10:00:00",
+            "fin": "2026-09-25T11:00:00",
+            "triaje": {"motivo": "Limpieza dental"},
+        },
+    ),
+        (
+        "solo inicio con zona horaria",
+        {
+            "recurso_id": 1,
+            "usuario_id": 1,
+            "inicio": "2026-09-25T10:00:00-06:00",
             "fin": "2026-09-25T11:00:00",
             "triaje": {"motivo": "Limpieza dental"},
         },
